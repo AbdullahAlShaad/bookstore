@@ -1,0 +1,41 @@
+pipeline {
+    agent {
+        docker {
+            image 'golang:1.17-alpine'
+            args '--user root -w /var/jenkins_home/workspace/bookstore-api'
+        }
+    }
+
+    environment {
+        GO111MODULE = 'on'
+        GOPATH = "${WORKSPACE}/.go"
+        GOCACHE = "${WORKSPACE}/.cache/go-build"
+    }
+
+    stages {
+        stage('Prepare Workspace') {
+            steps {
+                sh 'cp -r /workspace/bookstore-api-server/* ./'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''
+                    apk add --no-cache build-base
+                    mkdir -p build
+                    mkdir -p ${GOCACHE}
+                    go mod tidy
+                    go mod vendor
+                    go build -o build/bookstore-api-server
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'go test ./...'
+            }
+        }
+    }
+}
