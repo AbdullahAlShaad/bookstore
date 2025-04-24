@@ -1,26 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bookstore-backend
-  namespace: {{ .Values.global.namespace }}
+  name: {{ include "backend.fullname" . }}
+  namespace: {{ .Values.global.namespace | default "default" }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount | default (.Values.global.environments.production.replicas | default 1) }}
   selector:
     matchLabels:
-      app: bookstore-backend
+      {{- include "backend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: bookstore-backend
+        {{- include "backend.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-      - name: bookstore-backend
-        image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-        ports:
-        - containerPort: {{ .Values.service.port }}
-        env:
-        - name: CORS_ALLOWED_ORIGINS
-          value: "{{ .Values.env.CORS_ALLOWED_ORIGINS }}"
-        - name: PORT
-          value: "{{ .Values.env.port }}"
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.global.resources | nindent 12 }}

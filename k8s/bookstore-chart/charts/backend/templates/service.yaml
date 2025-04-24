@@ -1,11 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: bookstore-backend
-  namespace: {{ .Values.global.namespace }}
+  name: {{ include "backend.fullname" . }}
+  namespace: {{ .Values.global.namespace | default "default" }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
 spec:
-  selector:
-    app: bookstore-backend
+  type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: {{ .Values.service.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "backend.selectorLabels" . | nindent 4 }}

@@ -1,31 +1,47 @@
 global:
   namespace: bookstore
+  imageRegistry: abdullahalshaad
+  imagePullPolicy: Always
+  version: "2.0"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  environments:
+    production:
+      replicas: 3
+    staging:
+      replicas: 1
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
 
 frontend:
+  enabled: true
+  replicaCount: 1
   image:
-    repository: abdullahalshaad/bookstore-frontend
-    tag: "2.0"
-    pullPolicy: Always
-
+    repository: "bookstore-frontend"
+    tag: "3.0"
   env:
     REACT_APP_API_URL: "/api"
-
   service:
+    type: NodePort
     port: 80
     nodePort: 30000
-  backendUrl: "http://bookstore-backend.default.svc.cluster.local:8081"  
-
 
 backend:
+  enabled: true
+  replicaCount: 1
   image:
-    repository: abdullahalshaad/bookstore-backend
-    tag: "2.0"
-    pullPolicy: Always
-
+    repository: "bookstore-backend"
+    tag: ""
   env:
-    CORS_ALLOWED_ORIGINS: "http://localhost:3000"
+    CORS_ALLOWED_ORIGINS: "http://localhost:3003"
     PORT: "8081"
-
   service:
+    type: ClusterIP
     port: 8081
-

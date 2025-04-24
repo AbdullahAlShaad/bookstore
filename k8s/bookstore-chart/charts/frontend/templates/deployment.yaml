@@ -1,26 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bookstore-frontend
-  namespace: {{ .Values.global.namespace }}
+  name: {{ include "frontend.fullname" . }}
+  namespace: {{ .Values.global.namespace | default "default" }}
+  labels:
+    {{- include "frontend.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount | default (.Values.global.environments.production.replicas | default 1) }}
   selector:
     matchLabels:
-      app: bookstore-frontend
+      {{- include "frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: bookstore-frontend
+        {{- include "frontend.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.global.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-      - name: bookstore-frontend
-        image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
-        ports:
-        - containerPort: {{ .Values.service.port }}
-        env:
-        - name: REACT_APP_API_URL
-          value: "{{ .Values.env.REACT_APP_API_URL }}"
-        - name: http_backend_url
-          value: {{ .Values.backendUrl | quote }} 
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: BACKEND_URL
+              value: {{ printf "http://bookstore-backend.%s.svc.cluster.local:8081" .Values.global.namespace | quote }}
+          resources:
+            {{- toYaml .Values.global.resources | nindent 12 }}
