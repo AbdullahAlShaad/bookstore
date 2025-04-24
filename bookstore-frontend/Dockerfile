@@ -13,7 +13,12 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Add startup script to inject env.js
 COPY env.sh /docker-entrypoint.d/env.sh
-RUN chmod +x /docker-entrypoint.d/env.sh
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+COPY entrypoint.sh /
+
+# Make the script executable
+RUN chmod +x /entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
