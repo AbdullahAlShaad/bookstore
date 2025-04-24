@@ -18,9 +18,9 @@ frontend:
   env:
     REACT_APP_API_URL: "/api"
   service:
-    type: NodePort
+    type: ClusterIP
     port: 80
-    nodePort: 30000
+    #nodePort: 30000
   resources:
     requests:
       memory: "256Mi"
@@ -47,3 +47,12 @@ backend:
     limits:
       memory: "512Mi"
       cpu: "500m"
+
+# Ingress section moved to top level
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "bookstore.example.com"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  tls: []

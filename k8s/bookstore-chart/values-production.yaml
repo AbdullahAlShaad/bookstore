@@ -19,3 +19,6 @@ backend:
     limits:
       memory: "1024Mi"
       cpu: "1000m"
+
+ingress:
+  host: bookstore.live.com

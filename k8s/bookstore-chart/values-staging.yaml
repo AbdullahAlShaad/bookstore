@@ -19,3 +19,6 @@ backend:
     limits:
       memory: "512Mi"
       cpu: "500m"
+
+ingress:
+  host: bookstore.staging.com
