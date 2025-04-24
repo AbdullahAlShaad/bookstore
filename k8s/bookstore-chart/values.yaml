@@ -2,19 +2,8 @@ global:
   namespace: bookstore
   imageRegistry: abdullahalshaad
   imagePullPolicy: Always
+  # Default global version - can be used as a default image tag
   version: "3.0"
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "512Mi"
-      cpu: "500m"
-  environments:
-    production:
-      replicas: 3
-    staging:
-      replicas: 1
   tolerations:
     - key: "node-role.kubernetes.io/master"
       operator: "Exists"
@@ -32,15 +21,29 @@ frontend:
     type: NodePort
     port: 80
     nodePort: 30000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
 
 backend:
   enabled: true
   replicaCount: 1
   image:
     repository: "bookstore-backend"
-    tag: ""
+    tag: "3.0"
   env:
     PORT: "8081"
   service:
     type: ClusterIP
     port: 8081
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

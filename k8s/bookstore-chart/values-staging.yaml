@@ -1,0 +1,21 @@
+global:
+  namespace: demo
+frontend:
+  replicaCount: 1
+  image:
+    tag: "3.0"
+  service:
+    type: NodePort
+    nodePort: 30000
+
+backend:
+  replicaCount: 1
+  image:
+    tag: "3.0"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

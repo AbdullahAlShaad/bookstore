@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount | default (.Values.global.environments.production.replicas | default 1) }}
+  replicas: {{ .Values.replicaCount | default 1 }}
   selector:
     matchLabels:
       {{- include "backend.selectorLabels" . | nindent 6 }}
@@ -33,4 +33,4 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
           resources:
-            {{- toYaml .Values.global.resources | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
