@@ -1,0 +1,11 @@
+# Default values that can be overridden by parent chart
+enabled: true
+replicaCount: 1
+image:
+  repository: bookstore-frontend
+  tag: latest
+  pullPolicy: IfNotPresent
+env: {}
+service:
+  type: ClusterIP
+  port: 80

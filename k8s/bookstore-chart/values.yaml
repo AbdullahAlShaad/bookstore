@@ -1,0 +1,31 @@
+global:
+  namespace: bookstore
+
+frontend:
+  image:
+    repository: abdullahalshaad/bookstore-frontend
+    tag: "2.0"
+    pullPolicy: Always
+
+  env:
+    REACT_APP_API_URL: "/api"
+
+  service:
+    port: 80
+    nodePort: 30000
+  backendUrl: "http://bookstore-backend.default.svc.cluster.local:8081"  
+
+
+backend:
+  image:
+    repository: abdullahalshaad/bookstore-backend
+    tag: "2.0"
+    pullPolicy: Always
+
+  env:
+    CORS_ALLOWED_ORIGINS: "http://localhost:3000"
+    PORT: "8081"
+
+  service:
+    port: 8081
+
