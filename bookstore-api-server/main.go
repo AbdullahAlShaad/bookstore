@@ -5,12 +5,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth/v5"
-	"github.com/go-chi/cors"
 
 	"log"
 	"net/http"
-	"os"
-	"fmt"
 )
 
 
@@ -22,20 +19,6 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.URLFormat)
-
-	
-	// CORS middleware
-	corsAllowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
-	if corsAllowedOrigins == "" {
-		fmt.Println("NO CORS ORIGINS Given")
-	}
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{corsAllowedOrigins},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		AllowCredentials: true,
-		MaxAge:           300,
-	}))
 
 	r.Get("/",func(w http.ResponseWriter , r *http.Request) {
 		w.Write([]byte("root."))

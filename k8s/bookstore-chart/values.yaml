@@ -2,7 +2,7 @@ global:
   namespace: bookstore
   imageRegistry: abdullahalshaad
   imagePullPolicy: Always
-  version: "2.0"
+  version: "3.0"
   resources:
     requests:
       memory: "256Mi"
@@ -40,7 +40,6 @@ backend:
     repository: "bookstore-backend"
     tag: ""
   env:
-    CORS_ALLOWED_ORIGINS: "http://localhost:3003"
     PORT: "8081"
   service:
     type: ClusterIP
