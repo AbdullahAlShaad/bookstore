@@ -2,6 +2,7 @@
 enabled: true
 replicaCount: 1
 image:
+  imageRegistry: abdullahalshaad
   repository: bookstore-frontend
   tag: latest
   pullPolicy: IfNotPresent

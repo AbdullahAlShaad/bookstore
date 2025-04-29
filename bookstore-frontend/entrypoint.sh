@@ -1,17 +1,23 @@
 #!/bin/sh
 # This would be saved as entrypoint.sh in your container
 
-# Replace the backend URL in the nginx.conf with the environment variable
+# Set default BACKEND_URL if not provided
 BACKEND_URL=${BACKEND_URL:-http://bookstore-backend:8081}
 
-# Remove the protocol prefix (http:// or https://) for the proxy_pass
+# Extract just the host and port, without protocol or trailing path
 BACKEND_HOST=$(echo $BACKEND_URL | sed -e 's|^[^/]*//||' -e 's|/.*$||')
-BACKEND_PATH=$(echo $BACKEND_URL | grep -o '/.*$' || echo '')
 
-# If no path is found, default to '/'
+# Check if there's an actual path component (after the host:port)
+# If the URL contains a path after the host, extract it, otherwise use "/"
+BACKEND_PATH=$(echo $BACKEND_URL | grep -o '/[^:]*$' || echo '/')
+
+# If no path is found or it's empty, default to '/'
 if [ -z "$BACKEND_PATH" ]; then
   BACKEND_PATH="/"
 fi
+
+echo "Using backend host: $BACKEND_HOST"
+echo "Using backend path: $BACKEND_PATH"
 
 # Generate nginx configuration with the environment variable
 cat > /etc/nginx/conf.d/default.conf << EOF

@@ -1,0 +1,17 @@
+global:
+  namespace: demo
+  imageRegistry: localhost:5000
+
+
+backend:
+  replicaCount: 1
+  image:
+    tag: "1.0"
+
+frontend:
+  replicaCount: 1
+  image:
+    tag: "1.0"
+
+ingress:
+  host: bookstore.staging.com

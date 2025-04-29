@@ -5,8 +5,7 @@ frontend:
   image:
     tag: "3.0"
   service:
-    type: NodePort
-    nodePort: 30000
+    type: ClusterIP
 
 backend:
   replicaCount: 1

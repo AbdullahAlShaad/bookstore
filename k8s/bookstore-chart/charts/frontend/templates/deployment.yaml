@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "frontend.fullname" . }}
-  namespace: {{ .Values.global.namespace | default "default" }}
+  namespace: {{ $.Release.Namespace | default "default" }}
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
 spec:
@@ -21,7 +21,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
+          image: "{{ .Values.image.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy }}
           ports:
             - name: http
@@ -33,6 +33,6 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             - name: BACKEND_URL
-              value: {{ printf "http://bookstore-backend.%s.svc.cluster.local:8081" .Values.global.namespace | quote }}
+              value: {{ printf "http://%s-backend.%s.svc.cluster.local:8081" $.Release.Name $.Release.Namespace | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

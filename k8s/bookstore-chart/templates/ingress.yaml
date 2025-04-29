@@ -3,10 +3,9 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
-  namespace: {{ .Values.global.namespace | default "default" }}
+  namespace: {{ .Release.Namespace | default "default" }}
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # nginx.ingress.kubernetes.io/use-regex: "true"
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -16,20 +15,16 @@ spec:
   - host: {{ .Values.ingress.host | quote }}
     http:
       paths:
-      - path: /api/?(.*)
-        pathType: ImplementationSpecific
+      {{- range $svcName, $svc := .Values.ingress.services }}
+      - path: {{ $svc.path }}
+        pathType: {{ $svc.pathType }}
         backend:
           service:
-            name: {{ .Release.Name }}-backend
+            name: {{ $.Release.Name }}-{{ $svcName }}
             port:
-              number: {{ .Values.backend.service.port }}
-      - path: /?(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: {{ .Release.Name }}-frontend
-            port:
-              number: {{ .Values.frontend.service.port }}
+              number: {{ $svc.port }}
+      {{- end }}
+
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}

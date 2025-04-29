@@ -1,6 +1,4 @@
 global:
-  namespace: bookstore
-  imageRegistry: abdullahalshaad
   imagePullPolicy: Always
   # Default global version - can be used as a default image tag
   version: "3.0"
@@ -13,7 +11,6 @@ frontend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "bookstore-frontend"
     tag: "3.0"
   env:
     REACT_APP_API_URL: "/api"
@@ -33,7 +30,6 @@ backend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "bookstore-backend"
     tag: "3.0"
   env:
     PORT: "8081"
@@ -48,11 +44,45 @@ backend:
       memory: "512Mi"
       cpu: "500m"
 
+
 # Ingress section moved to top level
 ingress:
   enabled: true
   className: "nginx"
-  host: "bookstore.example.com"
+  host: "bookstore.live.com"
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  services:
+    frontend:
+      path: /
+      pathType: Prefix
+      port: 80
+    backend:
+      path: /api/?(.*)
+      pathType: ImplementationSpecific
+      port: 8081
+    grafana:
+      path: /grafana
+      pathType: Prefix
+      port: 3000
+
   tls: []
+
+
+grafana:
+  enabled: true
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://%(domain)s/grafana"
+      serve_from_sub_path: true
+  env:
+    GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s/grafana"
+    GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+    GF_AUTH_ANONYMOUS_ENABLED: "true"
+    GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+  auth.anonymous:
+    enabled: true
+    org_name: Main Org.
+    org_role: Viewer
+  adminPassword: admin
+  adminUser: admin

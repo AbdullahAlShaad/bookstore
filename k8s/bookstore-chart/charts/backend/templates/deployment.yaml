@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "backend.fullname" . }}
-  namespace: {{ .Values.global.namespace | default "default" }}
+  namespace: {{ $.Release.Namespace | default "default" }}
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 spec:
@@ -21,7 +21,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
+          image: "{{ .Values.image.imageRegistry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Values.global.version }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy }}
           ports:
             - name: http
